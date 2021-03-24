@@ -11,12 +11,12 @@ app.set("view engine","ejs")
 //It will store only one item. To solve the problem we will make array
 //var itemName = ""
 var items = ["Buy Food","Cook Food","Eat Food"]
+let workItems = []
 
 app.get('/',(req,res)=>{
 
     var options = {
         weekday : 'long',
-        year : 'numeric',
         month : 'long',
         day : 'numeric'
     }
@@ -29,7 +29,7 @@ app.get('/',(req,res)=>{
     //in get request only so that it does not throw error of 
     //not being defined.
     const data = today.toLocaleDateString("en-US",options)
-    res.render("list",{day:data,newListItems:items})
+    res.render("list",{listTitle:data,newListItems:items})
 
 })
 
@@ -40,8 +40,27 @@ app.post('/',(req,res)=>{
     //To avoid error what we have to do is give to do res.redirect
     //It will agaim lead to calling of app.get('/') and value of item
     //will be present.
-    items.push(itemName)
-    res.redirect("/")
+    if(req.body.list === "Work")
+    {
+        workItems.push(itemName)
+        res.redirect("/work")
+    }
+    else{
+        items.push(itemName)
+        res.redirect("/")
+    }
+   
+})
+
+app.get('/work',(req,res)=>{
+    res.render("list",{listTitle:"Work List",newListItems:workItems})
+})
+
+app.post("/work",(req,res)=>{
+    
+    let item = req.body.newItem
+    workItems.push(item)
+    res.redirect("/work")
 })
 
 app.listen(3000,()=>{
